@@ -1,5 +1,5 @@
 #### Libraries ####
-
+library("pROC", lib.loc="~/R/win-library/3.4")
 
 
 
@@ -40,10 +40,57 @@ set.seed(0817)
 bankdata$campaigngroup <- bankdata$campaign
 bankdata$campaigngroup[bankdata$campaign > 15] <- 16
 
-fun_glmML <- function(choiceML)
+vector <- c("age", "job", "marital",
+            "education","default","housing","month","day_of_week","duration","campaign",
+            "y")
+
+#"pdays","previous","poutcome",
+
+df_trainFiltered <- df_train[vector]
+
+# df_train model on df_train dataset
+glmfit <-
+  glm(
+    y~.,
+    data = df_trainFiltered,
+    family = binomial
+  )
+
+# Use fitted model to predict CV data, then calculate ROC and AUC
+glmpred <- predict.glm(glmfit, newdata = cv, type = "response", progress = "text")
+
+glmTable <- table(glmpred, cv$y)
+glmroc <- roc(cv$y, glmpred)
+
+#model accuracy
+glmauc <- glmroc$auc
+
+df_glmroc <- as.data.frame(glmroc$response)
+
+myCV <- cv
+myCV$predicted <- NULL
+myCV$actual <- cv$y
+for (row in 1:nrow(myCV))
+{
+  myCV[row, "predicted"] = as.factor(df_glmroc[row, "glmroc$response"])
+  
+}
+
+#glmTable2 <- table(glmroc, cv$y)
+
+
+
+
+fun_glmML <- function()
 {
   
-  vector <- c(choiceML, "y")
+  # vector <- c(choiceML, "y")
+  vector <- c("age", "job", "marital",
+              "education","default","housing","month","day_of_week","duration","campaign",
+              "y")
+  
+  #"pdays","previous","poutcome",
+  
   df_trainFiltered <- df_train[vector]
   
   # df_train model on df_train dataset
@@ -55,9 +102,26 @@ fun_glmML <- function(choiceML)
     )
   
   # Use fitted model to predict CV data, then calculate ROC and AUC
-  # glmpred <- predict(glmfit, newdata = cv, type = "response")
-  # 
-  # glmTable <- table(glmpred, cv$y)
+  glmpred <- predict.glm(glmfit, newdata = cv, type = "response", progress = "text")
+  
+  glmTable <- table(glmpred, cv$y)
+  glmroc <- roc(cv$y, glmpred)
+  
+  #model accuracy
+  glmauc <- glmroc$auc
+  
+  df_glmroc <- as.data.frame(glmroc$response)
+  
+  myCV <- cv
+  myCV$predicted <- NULL
+  myCV$actual <- cv$y
+  for (row in 1:nrow(myCV))
+  {
+    myCV[row, "predicted"] = as.factor(df_glmroc[row, "glmroc$response"])
+    
+  }
+  
+  glmTable2 <- table(glmroc, cv$y)
   # 
   return(glmfit)
   # glmroc <- roc(cv$y, glmpred)
@@ -65,8 +129,11 @@ fun_glmML <- function(choiceML)
   # 
 }
 
-fun_filteredDF <- function(choiceML)
-{
-  df_trainFiltered <- df_train[choiceML]
-  return(df_trainFiltered)
-}
+
+
+# 
+# fun_filteredDF <- function(choiceML)
+# {
+#   df_trainFiltered <- df_train[choiceML]
+#   return(df_trainFiltered)
+# }

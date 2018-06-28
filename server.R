@@ -441,24 +441,67 @@ shinyServer(function(input, output, session) {
       
       #### Marketing Prediction Section:Marketing Effectiveness ####
       output$DT_ML_GLM <- DT::renderDataTable({
-        # tt <- fun_glmML()
-        # glmpred <- predict(glmfit, newdata = cv, type = "response")
-        # 
-        # glmTable <- table(glmpred, cv$y)
         
-        selectedCols <- input$choice_GLM
-        dtTable <- fun_filteredDF(selectedCols)
-        
+        #model will be trained on this df
+        df_trainFiltered
         
       })
       
-      output$text_ML_GLM <- renderPrint({
+      
+      
+      #Train Model 
+      observeEvent(input$btn_GLM_predModel, {
+        #show summary box
+        shinyjs::show("div_mktSummary")
         
-        selectedCols <- input$choice_GLM
-        tt <- fun_glmML(selectedCols)
+        #display accuracy
+        output$uiOutput_Summary <- renderUI({
+          tags$blockquote(paste("Model Accuracy: ", glmauc))  
+        })
         
-        summary(tt)
+        
+        df_CV <- myCV[c("age","default","housing","actual","prediction"
+                        )]
+        
+        # myDT <- datatable(df_CV) %>% formatStyle(
+        #   'predicted',
+        #   backgroundColor = styleEqual(c('no', 'yes'), c('gray', 'yellow'))
+        # )
+        
+        dat <- datatable(iris, options = list(paging=FALSE)) %>%
+          formatStyle('Sepal.Length',  color = 'red', backgroundColor = 'orange', fontWeight = 'bold')
+        #return(dat)
+        
+        #display response dataframe
+        output$DT_ML_PRED <- DT::renderDataTable(
+          dat
+          # dat <- datatable(df_CV, options = list(paging=FALSE)) %>% formatStyle('Sepal.Length',  color = 'red', backgroundColor = 'orange', fontWeight = 'bold')
+          # return(dat)
+          
+          
+          # myDT,
+          # options = list(
+# rowCallback = JS('
+#             function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+#                                             // Bold and green cells for conditions
+#                                             if (parseFloat(aData[3]) >= 200)
+#                                             $("td:eq(3)", nRow).css("font-weight", "bold");
+#                                             if (parseFloat(aData[3]) >= 100)
+#                                             $("td:eq(3)", nRow).css("background-color", "#9BF59B");
+#                                   }'),
+                         # scrollX = TRUE, scrolly = TRUE)
+        )
+        
       })
+      
+      
+      # output$text_ML_GLM <- renderPrint({
+      #   
+      #   selectedCols <- input$choice_GLM
+      #   tt <- fun_glmML(selectedCols)
+      #   
+      #   summary(tt)
+      # })
       
       output$plot_ML_GLM <- renderPlot({
         

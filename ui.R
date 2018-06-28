@@ -570,41 +570,40 @@ dashboardPage(
               
               fluidRow(
                 
-                box(width = 12, title = "GLM", status = "primary",solidHeader = T, collapsible = T,
-                    box(width = 8, title = "Table", status = "primary",solidHeader = T, collapsible = T,
+                #box(width = 12, title = "GLM", status = "primary",solidHeader = T, collapsible = T,
+                    box(width = 12, title = "Table", status = "primary",solidHeader = T, collapsible = T,
                         #DT::dataTableOutput("DT_ML_GLM", width = "100%")
-                        div(id="stddiv",style = 'overflow-x: scroll', DT::dataTableOutput('DT_ML_GLM'))
-                    
-                    ),
-                    box(width = 4, title = "ML Choice", status = "primary",solidHeader = T, collapsible = T,
-                        checkboxGroupButtons(
-                          inputId = "choice_GLM", label = "Filter factors for Machine Learning  :", 
-                          choices = c("age", "job", "marital",
-                                      "education","default","housing",
-                                      "loan","month","day_of_week","duration","campaign",
-                                      "pdays","previous","poutcome"),
-                          selected = c("age", "job", "marital",
-                                       "education","default","housing",
-                                       "loan","month","day_of_week","duration","campaign",
-                                       "pdays","previous","poutcome"),
-                          justified = F, direction = "horizontal", status = "warning",
-                          checkIcon = list(yes = icon("ok", lib = "glyphicon"), no = icon("remove", lib = "glyphicon"))
-                        ),
+                        div(id="stddiv",style = 'overflow-x: scroll', DT::dataTableOutput('DT_ML_GLM')),
                         br(),
-                        actionButton("btn_GLM_prediction", "Predict Marketing Campaign Result",icon("envelope"),
-                                     style = "color: #fff; background-color: orange; 
-                                     border-color: orange; width: 100%; padding-left: 2dp; margin: 5dp;"
-                        )
-                    ),
-                    box(width = 12, title = "Summary", status = "primary",solidHeader = T, collapsible = T,
-                        verbatimTextOutput('text_ML_GLM')
-                    ),
-                    box(width = 12, title = "Plot", status = "primary",solidHeader = T, collapsible = T,
-                        plotOutput('plot_ML_GLM')
+                        tags$blockquote("Our model will be trained on above shown data.", style= "color: #3c8dbc;"),
+                    
+                    
+                        actionButton("btn_GLM_predModel", "Train Model",icon("envelope"),
+                                         style = "color: #fff; background-color: orange;
+                                         border-color: orange; width: 100%; padding-left: 2dp; margin: 5dp;"
+                            )
+                        
+                        ),
+                    
+                    
+                  
+                    hidden(
+                      div(id="div_mktSummary",
+                          box(width = 12, title = "Summary", status = "primary",solidHeader = T, collapsible = T,
+                              #verbatimTextOutput('text_ML_GLM')
+                              uiOutput('uiOutput_Summary'),
+                              br(),
+                             
+                                  div(id="div_mktPred",style = 'overflow-x: scroll', DT::dataTableOutput('DT_ML_PRED'))
+                                  
+                          )
+                          
+                      )
                     )
                     
-                )
-              )
+                    
+                
+              )#end of fluid row
       )
      
       #### ------------------- ####
