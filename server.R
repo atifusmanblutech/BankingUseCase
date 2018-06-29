@@ -3,8 +3,12 @@ library(shiny)
 library(shinydashboard)
 library(plotly)
 library(ggplot2)
+library(DT)
 
 library("ggplot2", lib.loc="~/R/win-library/3.4")
+library("DT", lib.loc="~/R/win-library/3.4")
+
+
 
 #### SOURCE FILES ####
 source('source/marketing.R')
@@ -460,36 +464,73 @@ shinyServer(function(input, output, session) {
         })
         
         
-        df_CV <- myCV[c("age","default","housing","actual","prediction"
+        df_CV <- myCV[c("age","default","housing","actual","predicted"
                         )]
         
-        # myDT <- datatable(df_CV) %>% formatStyle(
-        #   'predicted',
-        #   backgroundColor = styleEqual(c('no', 'yes'), c('gray', 'yellow'))
-        # )
+        # dat <- datatable(df_CV, options = list(dom = 'Bfrtip',
+        #                                        searching = T,
+        #                                        pageLength = 25,
+        #                                        searchHighlight = TRUE,
+        #                                        colReorder = TRUE,
+        #                                        fixedHeader = TRUE,
+        #                                        filter = 'top',
+        #                                        buttons = c('copy', 'csv', 'excel', 'print'),
+        #                                        paging    = TRUE,
+        #                                        deferRender = TRUE,
+        #                                        scroller = TRUE,
+        #                                        scrollX = TRUE,
+        #                                        scrollY = 550)) %>%
+        #   formatStyle('predicted',  color = 'white', backgroundColor = 'green', fontWeight = 'bold')
         
-        dat <- datatable(iris, options = list(paging=FALSE)) %>%
-          formatStyle('Sepal.Length',  color = 'red', backgroundColor = 'orange', fontWeight = 'bold')
-        #return(dat)
+        # sign_formatter <- formatter("span", 
+        #                             style = x ~ style(color = ifelse(x = "yes" , "green", 
+        #                                                              ifelse(x = "no", "red", "black"))))
+        # sign_formatter(c("no","yes"))
         
         #display response dataframe
         output$DT_ML_PRED <- DT::renderDataTable(
-          dat
-          # dat <- datatable(df_CV, options = list(paging=FALSE)) %>% formatStyle('Sepal.Length',  color = 'red', backgroundColor = 'orange', fontWeight = 'bold')
-          # return(dat)
+          #dat
+          DT::datatable(
+            df_CV,
+            selection = "single",
+            filter = 'bottom',
+            extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller'),
+            rownames = FALSE,
+            options = list(
+              # use rowCallback to highlight cells with MPG greater than 20
+              # rowCallback=DT::JS(
+              #   'function(row,data) {
+              #   if (parseFloat(data[4])=="yes") {
+              #   $("td:eq(1)",row).css("background","green");
+              #   }
+              #   }'),
+              dom = 'Bfrtip',
+              searching = T,
+              pageLength = 25,
+              searchHighlight = TRUE,
+              colReorder = TRUE,
+              fixedHeader = TRUE,
+              filter = 'top',
+              buttons = c('copy', 'csv', 'excel', 'print'),
+              paging    = TRUE,
+              deferRender = TRUE,
+              scroller = TRUE,
+              scrollX = TRUE,
+              scrollY = 400
+            )
+          ) %>%
+            formatStyle('predicted',  
+                        color = 'white', fontWeight = 'bold',
+                        background = styleEqual(c('yes','no'), c('green', 'red')))
+            # %>%
+            # formattable("")
           
-          
-          # myDT,
-          # options = list(
-# rowCallback = JS('
-#             function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-#                                             // Bold and green cells for conditions
-#                                             if (parseFloat(aData[3]) >= 200)
-#                                             $("td:eq(3)", nRow).css("font-weight", "bold");
-#                                             if (parseFloat(aData[3]) >= 100)
-#                                             $("td:eq(3)", nRow).css("background-color", "#9BF59B");
-#                                   }'),
-                         # scrollX = TRUE, scrolly = TRUE)
+            # Style cells with max_val vector
+            # formatStyle(
+            #   columns = 2:5,
+            #   backgroundColor = styleEqual(levels = max_val, values = rep("yellow", length(max_val)))
+            # )
+            # 
         )
         
       })
