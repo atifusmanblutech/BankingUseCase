@@ -5,7 +5,14 @@ library("pROC", lib.loc="~/R/win-library/3.4")
 
 #### File Reading and Manipulation ####
 bankdata <- read.csv('data/BankData_ML.csv', sep=";")
+# 
+# for (row in 1:nrow(bankdata))
+# {
+#   bankdata$id <- as.integer(row)
+#   #print(row)
+# }
 
+bankdata$id <- seq.int(nrow(bankdata))
 
 #Convert to factors, and change job levels
 bankdata$job <- as.character(bankdata$job)
@@ -22,17 +29,17 @@ bankdata$y <- as.factor(bankdata$y)
 # Split df_training and cv, so we get 60:20:20 proportion
 set.seed(0816)
 bankdata$rand <- runif(nrow(bankdata), 0, 1)
-bankdata$id <- "df_train"
-bankdata$id[bankdata$rand > 0.75] <- "cv"
+bankdata$partition <- "df_train"
+bankdata$partition[bankdata$rand > 0.75] <- "cv"
 
 # Override data so that 20% is "in the future"
-bankdata[(0.8 * nrow(bankdata)):(nrow(bankdata)), "id"] <- "test"
+bankdata[(0.8 * nrow(bankdata)):(nrow(bankdata)), "partition"] <- "test"
 
 # Create df_train dataset for exploratory analyses
 #Create df_train, cv and test datasets
-df_train <- bankdata[bankdata$id == "df_train", ]
-cv <- bankdata[bankdata$id == "cv", ]
-test <- bankdata[bankdata$id == "test", ]
+df_train <- bankdata[bankdata$partition == "df_train", ]
+cv <- bankdata[bankdata$partition == "cv", ]
+test <- bankdata[bankdata$partition == "test", ]
 
 #### ML: Generalized Linear Model ####
 set.seed(0817)

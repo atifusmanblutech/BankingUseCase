@@ -464,7 +464,7 @@ shinyServer(function(input, output, session) {
         })
         
         
-        df_CV <- myCV[c("age","default","housing","actual","predicted"
+        df_CV <- myCV[c("id","age","default","housing","actual","predicted"
                         )]
         
         # dat <- datatable(df_CV, options = list(dom = 'Bfrtip',
@@ -493,17 +493,10 @@ shinyServer(function(input, output, session) {
           DT::datatable(
             df_CV,
             selection = "single",
-            filter = 'bottom',
+            filter = 'top',
             extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller'),
             rownames = FALSE,
             options = list(
-              # use rowCallback to highlight cells with MPG greater than 20
-              # rowCallback=DT::JS(
-              #   'function(row,data) {
-              #   if (parseFloat(data[4])=="yes") {
-              #   $("td:eq(1)",row).css("background","green");
-              #   }
-              #   }'),
               dom = 'Bfrtip',
               searching = T,
               pageLength = 25,
